@@ -2,6 +2,8 @@
 
 “预算30元，想吃汉堡和喝的，帮我选几种。”
 
+![30元预算的真实核价快照](assets/result-preview.svg)
+
 麦麦预算餐是基于麦当劳中国 MCP 的点餐决策 Skill：查询所选门店菜单和可用优惠，将少量候选交给官方工具核价，给出预算内的餐单、剩余预算与优惠条件。适合想控制单餐预算、又不想反复切换菜单和优惠券页面的单人到店取餐用户。
 
 ## 能做什么
@@ -10,6 +12,17 @@
 - 显示整单应付总额、预算余量、餐品数量与优惠条件。
 - 换饮料或加小食后重新核价。
 - 无预算内方案时明确列出超额，不擅自增加预算。
+- 检查必选数量、不要的餐品和可替代的餐品类别，例如“至少两个汉堡”“饮料不要可乐”。
+- 使用批量入口一次处理最多三份已准备的候选；官方核价返回自动进入预算比较，减少手工抄价格。
+
+可以这样问：
+
+| 需求 | 输出重点 |
+|---|---|
+| “30元，汉堡和饮料” | 最低价、另两份不同搭配、剩余预算 |
+| “不要可乐，汉堡保留” | 检查排除项，替换后对完整餐单重新核价 |
+| “25元，两个汉堡” | 实际汉堡份数达到2，超预算时明确说明 |
+| “有券就比较，没有券也行” | 先核实门店可用券；没有券时正常比较 |
 
 本版仅支持同一门店、单人到店取餐，停在餐单建议阶段。没有自动下单功能。
 
@@ -22,7 +35,17 @@
 3. 下载本仓库。客户端支持 Skill 导入时，导入完整的 `skills/mcd-budget-meal` 文件夹；否则打开仓库目录，要求 AI 读取 `skills/mcd-budget-meal/SKILL.md`，按其中流程处理本次请求。只粘贴正文也可使用对话流程，配套脚本需能访问本地文件。
 4. 输入预算、门店、喜欢或不想要的餐品。AI 通过你的 MCP 连接器查询并核价，然后展示餐单。
 
-WorkBuddy 若报告 `/items: must be array`，使用[直连核价说明](skills/mcd-budget-meal/references/workbuddy-compatibility.md)。脚本用相同官方 Streamable HTTP 服务和本机认证查询，不经过 WorkBuddy 的延迟工具入口，不需要重新申请 Token。
+**WorkBuddy用户的简便安装**：下载仓库 ZIP并解压，在仓库目录的 PowerShell 中运行 `./install.ps1`，然后新开 WorkBuddy 会话。脚本只复制技能文件，已有技能会先备份；它不安装软件、不读取 Token、不修改连接器。也可以把下面这句话发给自己的 WorkBuddy：
+
+```text
+请安装技能 https://github.com/Sam-Hui-dot/mcd-budget-meal 。
+将 skills/mcd-budget-meal 整个文件夹放入用户技能目录，保留 scripts 和 references。
+安装后告诉我实际目录，并提示我新开会话。已有麦当劳连接器，不要重配。
+```
+
+完整点击顺序和常见问题见 [快速开始](docs/quick-start.md)。
+
+WorkBuddy 若报告 `/items: must be array`，Skill会改用项目内的官方 MCP直连路径。无需反复修改连接器或重新申请 Token，具体操作见[直连核价说明](skills/mcd-budget-meal/references/workbuddy-compatibility.md)。
 
 公开配置示例在 [mcp-config.example.json](mcp-config.example.json)，只含 `${MCD_MCP_TOKEN}` 占位符。环境变量展开方式取决于客户端；若不支持，在客户端自己的私有连接器配置中填入 Token，不修改公开示例、不把 Token 发到聊天里。
 
@@ -73,13 +96,47 @@ python skills/mcd-budget-meal/scripts/compare_meals.py private/live-quotes.json 
 
 主要工具：`query-nearby-stores`、`query-meals`、`query-store-coupons`、`query-meal-detail`、`calculate-price`。具体职责和接入状态见 [MCP_INTEGRATION.md](MCP_INTEGRATION.md)。
 
+## 批量核价与自动比较
+
+AI先查询当前真实菜单、套餐详情和券，再将完整候选写入 `private/meal-plan.json`。用户不需要手写编码或价格。在仓库目录运行：
+
+```powershell
+python skills/mcd-budget-meal/scripts/quote_meals.py private/meal-plan.json --use-workbuddy-config --records-dir private/run-001
+```
+
+脚本检查餐单组成与请求是否一致，读取当前官方工具定义确认金额单位，然后顺序核价最多三份候选。成功报价自动换算为整数分、检查偏好并生成比较表。第一次失败后停止剩余请求，不自动重试；已有有效结果仍可查看。详细格式见[餐单计划说明](skills/mcd-budget-meal/references/meal-plan.md)。
+
+想先了解计划结构，可以做本地检查（不联网、不读取凭证）：
+
+```powershell
+python skills/mcd-budget-meal/scripts/quote_meals.py examples/plan-template.json --check-plan
+```
+
+这个模板全部使用虚构编码，标为 `demo`，脚本禁止将它发到官方服务。原始调用记录只可写入本项目 `private/`，公开展示请使用经过人工脱敏的摘要。
+
 ## 当前状态与边界
 
 2026年10月11日在深圳南科大餐厅完成真实菜单、可用券和套餐详情查询，三份官方核价分别为 ¥14.90、¥22.90、¥26.90；比较脚本成功计算预算余量。大堡口福三件套将可乐换为无糖可乐后重新核价为 ¥22.90。见[本次真实运行](examples/verified-run.md)。
 
-WorkBuddy 的原生核价入口仍存在 `/items: must be array` 校验问题；设置直接加载未在该运行中生效。项目的 `mcp_query.py` 直连路径已成功运行，保留原版核价和预算比较功能。宿主里的完整对话仍需使用更新后的 Skill；上述验证覆盖本次门店、三份候选和一次替换。`demo-quotes.json` 始终是模拟数据。
+上述真实运行属于初版单工具直连路径。此次升级新增批量入口、偏好数量检查、安装脚本和离线回归用例；新入口的验证状态单独记录在 [版本说明](CHANGELOG.md)，不扩大原有真实运行记录的范围。`demo-quotes.json` 始终是模拟数据。
 
 比较只覆盖本轮候选；它不保证全菜单最低价。价格、券适用性和供应状态以麦当劳官方当前结果为准。营养、配料及过敏原未纳入本版推荐规则。
+
+## 项目结构
+
+```text
+skills/mcd-budget-meal/
+  SKILL.md                 对话流程、门店和候选选择
+  scripts/mcp_query.py     官方 MCP查询客户端
+  scripts/quote_meals.py   批量核价、请求绑定、自动比较
+  scripts/compare_meals.py 预算与偏好检查、排序、Markdown输出
+  references/             数据格式和兼容说明
+examples/                 虚构示例与历史真实运行摘要
+tests/                    纯离线回归用例，无Token、无网络
+install.ps1               Windows用户级技能安装
+```
+
+离线回归命令为 `python -m unittest discover -s tests -v`，检查金额、数量、排除项、过期报价、异常响应和失败停止行为。它使用合成响应，不代表真实 MCP 联调结果。
 
 ## 许可与声明
 

@@ -6,6 +6,14 @@
 
 ## 用法
 
+新版本推荐让 AI根据已查询的真实菜单准备 `private/meal-plan.json`，再运行：
+
+```powershell
+python skills/mcd-budget-meal/scripts/quote_meals.py private/meal-plan.json --use-workbuddy-config --records-dir private/run-001
+```
+
+这一入口顺序核价最多三份候选、自动转换整单金额并生成比较表。首次失败即停止后续请求，不经过 WorkBuddy延迟工具入口。格式见 [meal-plan.md](meal-plan.md)。下方单工具命令仍可用于查菜单、详情和单次诊断。
+
 前提：Python 3.10及以上；用户已授权使用自己的麦当劳连接器查询和核价。脚本固定访问 `https://mcp.mcd.cn`，仅允许五个查询或核价工具，不下单、不领券、不支付，不修改连接器。
 
 默认从 `MCD_MCP_TOKEN` 环境变量取得认证。本机已配置 WorkBuddy 的用户可以显式使用 `--use-workbuddy-config`，读取 `~/.workbuddy/mcp.json` 中现有的 mcd-mcp 认证。凭证不传入命令行、不打印、不保存到响应文件。

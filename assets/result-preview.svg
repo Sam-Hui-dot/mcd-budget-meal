@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">麦麦预算餐：30元预算的三份真实核价记录</title>
+  <desc id="desc">2026年10月11日深圳南科大餐厅的历史核价快照，不是实时售价。三份套餐分别14.90、22.90、26.90元。</desc>
+  <rect width="960" height="360" rx="24" fill="#fff8e6"/>
+  <text x="40" y="57" font-family="Microsoft YaHei, sans-serif" font-size="29" font-weight="700" fill="#222">麦麦预算餐</text>
+  <text x="40" y="91" font-family="Microsoft YaHei, sans-serif" font-size="17" fill="#57534e">预算30元 · 汉堡＋饮料 · 同店自取 · 官方核价后比较</text>
+  <g font-family="Microsoft YaHei, sans-serif">
+    <rect x="40" y="119" width="280" height="157" rx="16" fill="#fff" stroke="#e8d79f"/>
+    <text x="60" y="153" font-size="18" fill="#222">人气经典随心配</text>
+    <text x="60" y="201" font-size="34" font-weight="700" fill="#166534">¥14.90</text>
+    <text x="60" y="242" font-size="17" fill="#57534e">预算剩余 ¥15.10</text>
+    <rect x="340" y="119" width="280" height="157" rx="16" fill="#fff" stroke="#e8d79f"/>
+    <text x="360" y="153" font-size="18" fill="#222">大堡口福三件套</text>
+    <text x="360" y="201" font-size="34" font-weight="700" fill="#222">¥22.90</text>
+    <text x="360" y="242" font-size="17" fill="#57534e">预算剩余 ¥7.10</text>
+    <rect x="640" y="119" width="280" height="157" rx="16" fill="#fff" stroke="#e8d79f"/>
+    <text x="660" y="153" font-size="18" fill="#222">龙焰鸡腿堡三件套</text>
+    <text x="660" y="201" font-size="34" font-weight="700" fill="#222">¥26.90</text>
+    <text x="660" y="242" font-size="17" fill="#57534e">预算剩余 ¥3.10</text>
+    <text x="40" y="312" font-size="15" fill="#57534e">历史核价快照：2026-10-11 · 深圳南科大餐厅 · 本次无可用券</text>
+    <text x="40" y="338" font-size="14" fill="#78716c">当前餐品、价格与优惠需要重新查询；本项目停在餐单建议，不自动下单。</text>
+  </g>
+</svg>

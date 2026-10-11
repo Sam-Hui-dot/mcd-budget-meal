@@ -85,6 +85,38 @@ class Client:
         self.protocol = response["result"]["protocolVersion"]
         self.rpc("notifications/initialized", {}, notification=True)
 
+    def describe(self, tool):
+        if tool not in TOOLS:
+            raise ValueError("Tool outside read-only allowlist")
+        response = self.rpc("tools/list", {})
+        if not isinstance(response, dict) or "error" in response:
+            raise RuntimeError("Cannot read current tool schema")
+        result = response.get("result", {})
+        for definition in result.get("tools", []):
+            if definition.get("name") == tool:
+                return definition
+        raise RuntimeError("Required tool unavailable in first tools/list page")
+
+    def call(self, tool, arguments):
+        if tool not in TOOLS:
+            raise ValueError("Tool outside read-only allowlist")
+        return self.rpc("tools/call", {"name": tool, "arguments": arguments})
+
+
+def structured_result(response):
+    """Extract a successful official business response, never invent a zero price."""
+    if not isinstance(response, dict) or "error" in response:
+        raise ValueError("MCP 返回协议错误或空响应")
+    result = response.get("result")
+    if not isinstance(result, dict) or result.get("isError"):
+        raise ValueError("MCP 工具返回错误")
+    payload = result.get("structuredContent")
+    if not isinstance(payload, dict):
+        raise ValueError("缺少 structuredContent；需检查服务返回格式")
+    if payload.get("success") is not True:
+        raise ValueError("官方核价未明确成功；本轮停止，不重试")
+    return payload
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -106,10 +138,9 @@ def main():
     client = Client(authorization(opts.use_workbuddy_config))
     client.initialize()
     if opts.describe:
-        response = client.rpc("tools/list", {})
-        output = next(t for t in response["result"]["tools"] if t["name"] == opts.tool)
+        output = client.describe(opts.tool)
     else:
-        response = client.rpc("tools/call", {"name": opts.tool, "arguments": arguments})
+        response = client.call(opts.tool, arguments)
         record = {"recorded_at": datetime.now(timezone.utc).isoformat(), "transport": "direct Streamable HTTP", "tool": opts.tool, "arguments": arguments, "response": response}
         if opts.output:
             opts.output.parent.mkdir(parents=True, exist_ok=True)

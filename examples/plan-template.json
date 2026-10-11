@@ -1,0 +1,29 @@
+{
+  "data_kind": "demo",
+  "store": "DEMO-STORE",
+  "mode": "pickup",
+  "budget_cents": 3000,
+  "excluded_terms": ["可乐"],
+  "required_groups": [
+    {"name": "汉堡", "codes": ["DEMO-BURGER"], "minimum": 1},
+    {"name": "饮料", "codes": ["DEMO-TEA"], "minimum": 1}
+  ],
+  "candidates": [
+    {
+      "id": "demo-basic",
+      "title": "模拟汉堡与茶饮",
+      "items": [
+        {"code": "DEMO-BURGER", "name": "示例汉堡", "quantity": 1},
+        {"code": "DEMO-TEA", "name": "示例茶饮", "quantity": 1}
+      ],
+      "conditions": ["模拟结构，无真实优惠券；不能发送到官方服务"],
+      "arguments": {
+        "storeCode": "DEMO-STORE", "orderType": 1, "beType": 1,
+        "items": [
+          {"productCode": "DEMO-BURGER", "quantity": 1},
+          {"productCode": "DEMO-TEA", "quantity": 1}
+        ]
+      }
+    }
+  ]
+}

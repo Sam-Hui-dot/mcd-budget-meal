@@ -7,6 +7,7 @@ import sys
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+from collections import Counter
 
 
 def text_value(value, field):
@@ -82,9 +83,60 @@ def meal_items(value):
 def basket_key(items):
     quantities = {}
     for item in items:
+        if item["container"]:
+            continue
         key = (item["code"], item["option_key"], item["container"])
         quantities[key] = quantities.get(key, 0) + item["quantity"]
     return tuple(sorted((key, quantity) for key, quantity in quantities.items()))
+
+
+def constraints(data):
+    """Parse explicit preferences once, before accepting any candidate."""
+    required = {code: 1 for code in strings(data.get("required_codes", []), "required_codes")}
+    quantities = data.get("required_quantities", {})
+    if not isinstance(quantities, dict):
+        raise ValueError("required_quantities 必须是编码到最低数量的对象")
+    for code, count in quantities.items():
+        code = text_value(code, "required_quantities.code")
+        required[code] = max(required.get(code, 0), integer(count, "required_quantities.count", 1))
+    forbidden = set(strings(data.get("excluded_codes", []), "excluded_codes"))
+    if forbidden.intersection(required):
+        raise ValueError("同一餐品不能同时必选和排除")
+    terms = strings(data.get("excluded_terms", []), "excluded_terms")
+    groups = data.get("required_groups", [])
+    if not isinstance(groups, list):
+        raise ValueError("required_groups 必须是数组")
+    normalized = []
+    for group in groups:
+        if not isinstance(group, dict):
+            raise ValueError("required_groups 每项必须是对象")
+        codes = set(strings(group.get("codes"), "required_groups.codes"))
+        if not codes or not codes - forbidden:
+            raise ValueError("必选类别需要至少一个未被排除的实际餐品编码")
+        normalized.append({"name": text_value(group.get("name"), "required_groups.name"),
+                           "codes": codes, "minimum": integer(group.get("minimum", 1), "required_groups.minimum", 1)})
+    return {"required": required, "forbidden": forbidden, "terms": terms, "groups": normalized}
+
+
+def check_preferences(items, rules):
+    actual = [item for item in items if not item["container"]]
+    counts = Counter()
+    for item in actual:
+        counts[item["code"]] += item["quantity"]
+    for code, minimum in rules["required"].items():
+        if counts[code] < minimum:
+            raise ValueError(f"必选餐品 {code} 至少 {minimum} 份，实际 {counts[code]} 份")
+    for item in items:
+        if item["code"] in rules["forbidden"]:
+            raise ValueError("包含排除餐品：" + item["name"])
+    for item in actual:
+        for term in rules["terms"]:
+            if term.casefold() in item["name"].casefold():
+                raise ValueError(f"餐品 {item['name']} 命中排除词：{term}")
+    for group in rules["groups"]:
+        count = sum(counts[code] for code in group["codes"])
+        if count < group["minimum"]:
+            raise ValueError(f"{group['name']} 至少 {group['minimum']} 份，实际 {count} 份")
 
 
 def compare(data, max_age_minutes=15, now=None):
@@ -97,7 +149,8 @@ def compare(data, max_age_minutes=15, now=None):
     if data.get("mode") != "pickup":
         raise ValueError("本版只支持 pickup 到店取餐")
     budget = integer(data.get("budget_cents"), "budget_cents")
-    required = set(strings(data.get("required_codes", []), "required_codes"))
+    rules = constraints(data)
+    integer(max_age_minutes, "max_age_minutes", 1)
     candidates = data.get("candidates")
     if not isinstance(candidates, list) or not 1 <= len(candidates) <= 6:
         raise ValueError("candidates 需要 1–6 份候选")
@@ -115,9 +168,7 @@ def compare(data, max_age_minutes=15, now=None):
             title = text_value(candidate.get("title"), "title")
             items = meal_items(candidate.get("items"))
             conditions = strings(candidate.get("conditions", []), "conditions")
-            codes = {item["code"] for item in items if not item["container"]}
-            if not required <= codes:
-                raise ValueError("未包含全部必选餐品：" + "、".join(sorted(required - codes)))
+            check_preferences(items, rules)
             quote = candidate.get("quote")
             if not isinstance(quote, dict):
                 raise ValueError("缺少官方核价整理结果")
@@ -158,7 +209,9 @@ def compare(data, max_age_minutes=15, now=None):
     within = [item for item in unique if item["remaining_cents"] >= 0]
     over = [item for item in unique if item["remaining_cents"] < 0]
     return {"data_kind": kind, "store": store, "mode": "pickup", "budget_cents": budget,
-            "recommended": within[:3], "over_budget": over[:3], "excluded": excluded}
+            "recommended": within[:3], "over_budget": over[:3], "excluded": excluded,
+            "summary": {"submitted": len(candidates), "valid_distinct": len(unique),
+                        "within_budget": len(within), "excluded": len(excluded)}}
 
 
 def money(cents):
@@ -173,6 +226,16 @@ def markdown(result):
     label = "模拟示例 · 非实时售价" if result["data_kind"] == "demo" else "本轮官方核价整理结果"
     lines = [f"# 麦麦预算餐 · {label}", "",
              f"门店：{cell(result['store'])} · 到店取餐 · 预算：{money(result['budget_cents'])}", ""]
+    if result["recommended"]:
+        best = result["recommended"][0]
+        lines.extend([f"本轮最低价：**{cell(best['title'])} · {money(best['payable_cents'])}**，"
+                      f"预算剩余 {money(best['remaining_cents'])}。", ""])
+    elif result["over_budget"]:
+        closest = result["over_budget"][0]
+        lines.extend([f"本轮有效餐单全部超预算；最接近的是 {cell(closest['title'])}，"
+                      f"超出 {money(-closest['remaining_cents'])}。", ""])
+    else:
+        lines.extend(["本轮没有有效报价，请按下方原因处理后重新核价。", ""])
     groups = [("预算内餐单", result["recommended"]), ("超预算参考", result["over_budget"])]
     for heading, plans in groups:
         if not plans:
