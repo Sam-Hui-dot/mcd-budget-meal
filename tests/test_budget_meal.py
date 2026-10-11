@@ -2,14 +2,17 @@
 import copy
 import json
 import sys
+import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "skills" / "mcd-budget-meal" / "scripts"))
+import quote_meals
 from compare_meals import compare, markdown
-from quote_meals import bind_items, normalize, prepare_plan, run, schema_types
+from quote_meals import bind_items, normalize, prepare_plan, private_path, project_root, run, schema_types
 
 NOW = datetime(2026, 10, 11, 10, 0, tzinfo=timezone.utc)
 
@@ -126,6 +129,65 @@ class BudgetChecks(unittest.TestCase):
         value = demo()
         value["candidates"][0]["items"] = [None]
         self.assertEqual("demo-combo", compare(value, now=NOW)["recommended"][0]["id"])
+
+
+def skill_tree(base, readme=False):
+    """Synthetic skill layout: <base>/skills/mcd-budget-meal/scripts, plus optional README.md."""
+    scripts = Path(base) / "skills" / "mcd-budget-meal" / "scripts"
+    scripts.mkdir(parents=True, exist_ok=True)
+    (scripts.parent / "SKILL.md").write_text("---\nname: mcd-budget-meal\n---\n", encoding="utf-8")
+    if readme:
+        Path(base, "README.md").write_text("# synthetic checkout\n", encoding="utf-8")
+    return scripts
+
+
+class PlanDiagnostics(unittest.TestCase):
+    def test_binding_error_names_the_candidate(self):
+        value = plan()
+        value["candidates"][0]["id"] = "combo-a"
+        value["candidates"][0]["items"][0]["quantity"] = 2
+        with self.assertRaisesRegex(ValueError, r"候选 combo-a：.*不一致"):
+            prepare_plan(value)
+
+    def test_preference_error_names_the_candidate_and_keeps_reason(self):
+        value = plan()
+        value["candidates"][0]["id"] = "basic"
+        value["required_quantities"] = {"DEMO-BURGER": 2}
+        with self.assertRaisesRegex(ValueError, r"候选 basic：.*至少 2 份，实际 1 份"):
+            prepare_plan(value)
+
+    def test_second_candidate_is_named_not_the_first(self):
+        value = plan()
+        value["candidates"][0]["id"] = "first"
+        extra = copy.deepcopy(value["candidates"][0])
+        extra["id"] = "second"
+        extra["items"][0]["quantity"] = 2
+        value["candidates"].append(extra)
+        with self.assertRaisesRegex(ValueError, r"候选 second：") as caught:
+            prepare_plan(value)
+        self.assertNotIn("候选 first", str(caught.exception))
+
+    def test_installed_skill_keeps_records_inside_itself(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp).resolve() / "home"
+            scripts = skill_tree(home / ".workbuddy")
+            self.assertEqual(scripts.parent, project_root(scripts))
+            with patch.object(quote_meals, "PROJECT_ROOT", scripts.parent):
+                self.assertEqual(scripts.parent / "private" / "run-001",
+                                 private_path(scripts.parent / "private" / "run-001"))
+                with self.assertRaises(ValueError):
+                    private_path(home / "private" / "run-001")
+
+    def test_repository_checkout_keeps_existing_private_rule(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repository = Path(tmp).resolve() / "repo"
+            scripts = skill_tree(repository, readme=True)
+            self.assertEqual(repository, project_root(scripts))
+            with patch.object(quote_meals, "PROJECT_ROOT", repository):
+                self.assertEqual(repository / "private" / "run-001",
+                                 private_path(repository / "private" / "run-001"))
+                with self.assertRaises(ValueError):
+                    private_path(Path(tmp).resolve() / "elsewhere" / "private" / "run-001")
 
 
 class WorkflowChecks(unittest.TestCase):

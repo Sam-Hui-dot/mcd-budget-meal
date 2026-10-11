@@ -13,9 +13,25 @@ from compare_meals import (amount_cents, check_preferences, compare, constraints
 from mcp_query import Client, authorization, structured_result
 
 SCRIPT_ROOT = Path(__file__).resolve().parent
-REPOSITORY_ROOT = SCRIPT_ROOT.parents[2]
-PROJECT_ROOT = (REPOSITORY_ROOT if (REPOSITORY_ROOT / "skills" / "mcd-budget-meal").is_dir()
-                else SCRIPT_ROOT.parent)
+SKILL_ROOT = SCRIPT_ROOT.parent
+SKILL_MARKER = Path("skills") / "mcd-budget-meal" / "SKILL.md"
+
+
+def project_root(script_root=None):
+    """Directory whose private/ holds raw records.
+
+    Running from a repository checkout keeps records in <repo>/private/. Installed
+    under a skills directory, records stay in the skill's own private/, so they can
+    be found and deleted without writing into an unrelated parent directory.
+    """
+    root = Path(script_root or SCRIPT_ROOT)
+    repository = root.parents[2]
+    if (repository / SKILL_MARKER).is_file() and (repository / "README.md").is_file():
+        return repository
+    return root.parent
+
+
+PROJECT_ROOT = project_root()
 
 
 def digest(value):
@@ -118,25 +134,30 @@ def prepare_plan(plan):
         if label in seen:
             raise ValueError("候选 id 重复")
         seen.add(label)
-        args = candidate.get("arguments")
-        if not isinstance(args, dict):
-            raise ValueError("每份候选必须有完整的 arguments 对象")
-        if args.get("storeCode") != store or type(args.get("beType")) is not int or args.get("beType") != 1:
-            raise ValueError("全部候选必须属于所选门店和到店取餐场景")
-        if type(args.get("orderType")) is not int or args.get("orderType") != 1:
-            raise ValueError("orderType 必须为 1")
-        if any(key in args for key in ("beCode", "withOrder", "gmServiceCode", "reservationDate")):
-            raise ValueError("本入口不支持预约、业务编码、团餐或随单购会员参数")
-        items = bind_items(candidate.get("items"), args)
-        check_preferences(items, rules)
-        conditions = strings(candidate.get("conditions", []), "conditions")
-        has_coupon = any("couponId" in item or "couponCode" in item for item in args["items"])
-        for item in args["items"]:
-            if "couponId" in item or "couponCode" in item:
-                text_value(item.get("couponId"), "couponId")
-                text_value(item.get("couponCode"), "couponCode")
-        if has_coupon and not conditions:
-            raise ValueError("使用券的候选必须写明本次门店适用条件")
+        try:
+            args = candidate.get("arguments")
+            if not isinstance(args, dict):
+                raise ValueError("每份候选必须有完整的 arguments 对象")
+            if args.get("storeCode") != store or type(args.get("beType")) is not int or args.get("beType") != 1:
+                raise ValueError("全部候选必须属于所选门店和到店取餐场景")
+            if type(args.get("orderType")) is not int or args.get("orderType") != 1:
+                raise ValueError("orderType 必须为 1")
+            if any(key in args for key in ("beCode", "withOrder", "gmServiceCode", "reservationDate")):
+                raise ValueError("本入口不支持预约、业务编码、团餐或随单购会员参数")
+            items = bind_items(candidate.get("items"), args)
+            check_preferences(items, rules)
+            conditions = strings(candidate.get("conditions", []), "conditions")
+            has_coupon = any("couponId" in item or "couponCode" in item for item in args["items"])
+            for item in args["items"]:
+                if "couponId" in item or "couponCode" in item:
+                    text_value(item.get("couponId"), "couponId")
+                    text_value(item.get("couponCode"), "couponCode")
+            if has_coupon and not conditions:
+                raise ValueError("使用券的候选必须写明本次门店适用条件")
+        except ValueError as exc:
+            # Keep the original reason; say which candidate failed so one bad row
+            # never looks like a whole-plan failure.
+            raise ValueError(f"候选 {label}：{exc}") from exc
         prepared.append({"id": label, "title": text_value(candidate.get("title"), "title"),
                          "items": items, "conditions": conditions, "arguments": args})
     output = {key: plan[key] for key in ("required_codes", "required_quantities", "excluded_codes",

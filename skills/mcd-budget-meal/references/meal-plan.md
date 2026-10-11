@@ -41,11 +41,11 @@ python skills/mcd-budget-meal/scripts/quote_meals.py examples/plan-template.json
 python skills/mcd-budget-meal/scripts/quote_meals.py private/meal-plan.json --use-workbuddy-config --records-dir private/run-001
 ```
 
-每一轮使用新的空记录目录，避免覆盖旧证据。在仓库运行时，原始记录只写到仓库 `private/`；技能单独安装时，只允许写到该技能自己的 `private/`。不指定记录目录也可以比较，但仅有请求摘要，没有落盘的原始返回，不应把摘要当作服务端调用凭证。设置环境变量 `MCD_MCP_TOKEN`时可省略 `--use-workbuddy-config`。
+每一轮使用新的空记录目录，避免覆盖旧证据。记录目录按脚本所在位置确定：从仓库副本运行时写到仓库 `private/`；技能单独安装在 `~/.workbuddy/skills/mcd-budget-meal` 之类的技能目录时，写到该技能自己的 `private/`，不会写到技能目录之外。不指定记录目录也可以比较，但仅有请求摘要，没有落盘的原始返回，不应把摘要当作服务端调用凭证。设置环境变量 `MCD_MCP_TOKEN`时可省略 `--use-workbuddy-config`。
 
 ## 失败规则与输出
 
-1. 本地计划有冲突或组成不一致：整个计划拒绝，在认证和业务调用前修正。
+1. 本地计划有冲突或组成不一致：整个计划拒绝，在认证和业务调用前修正；错误信息标明是哪一份候选（`候选 <id>：<原因>`），便于只改那一份。
 2. schema或金额单位改变：在核价前停止。
 3. 核价失败、连接中断或返回无法解释：停止后续候选，保留本轮此前已成功的结果；不重试。
 4. 价格缺失、不是有限非负金额、回显商品不一致：不生成零元或猜测价格。
