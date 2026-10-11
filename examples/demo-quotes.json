@@ -1,0 +1,58 @@
+{
+  "data_kind": "demo",
+  "store": "模拟门店（不对应真实餐厅）",
+  "mode": "pickup",
+  "budget_cents": 3000,
+  "required_codes": ["DEMO-BURGER"],
+  "candidates": [
+    {
+      "id": "demo-basic",
+      "title": "基础搭配",
+      "items": [
+        {"code": "DEMO-BURGER", "name": "示例汉堡", "quantity": 1},
+        {"code": "DEMO-TEA", "name": "示例茶饮", "quantity": 1}
+      ],
+      "conditions": ["模拟普通组合，无真实优惠券"],
+      "quote": {
+        "status": "ok", "tool": "calculate-price", "source_ref": "DEMO-NOT-A-REAL-CALL-1",
+        "amount_field": "demo.payable", "source_amount": "23.00", "source_unit": "yuan",
+        "currency": "CNY", "payable_cents": 2300, "quoted_at": "2026-10-11T16:00:00+08:00",
+        "store": "模拟门店（不对应真实餐厅）", "mode": "pickup"
+      }
+    },
+    {
+      "id": "demo-combo",
+      "title": "加小食搭配",
+      "items": [
+        {"code": "DEMO-COMBO", "name": "示例套餐", "quantity": 1, "container": true},
+        {"code": "DEMO-BURGER", "name": "示例汉堡", "quantity": 1},
+        {"code": "DEMO-FRIES-S", "name": "示例小份薯条", "quantity": 1},
+        {"code": "DEMO-TEA", "name": "示例茶饮", "quantity": 1}
+      ],
+      "conditions": ["模拟优惠条件，仅演示信息展示"],
+      "quote": {
+        "status": "ok", "tool": "calculate-price", "source_ref": "DEMO-NOT-A-REAL-CALL-2",
+        "amount_field": "demo.payable", "source_amount": 2850, "source_unit": "cent",
+        "currency": "CNY", "payable_cents": 2850, "quoted_at": "2026-10-11T16:00:00+08:00",
+        "store": "模拟门店（不对应真实餐厅）", "mode": "pickup"
+      }
+    },
+    {
+      "id": "demo-extra",
+      "title": "增加一份小食",
+      "items": [
+        {"code": "DEMO-BURGER", "name": "示例汉堡", "quantity": 1},
+        {"code": "DEMO-FRIES-S", "name": "示例小份薯条", "quantity": 1},
+        {"code": "DEMO-TEA", "name": "示例茶饮", "quantity": 1},
+        {"code": "DEMO-SNACK", "name": "示例小食", "quantity": 1}
+      ],
+      "conditions": [],
+      "quote": {
+        "status": "ok", "tool": "calculate-price", "source_ref": "DEMO-NOT-A-REAL-CALL-3",
+        "amount_field": "demo.payable", "source_amount": "32.50", "source_unit": "yuan",
+        "currency": "CNY", "payable_cents": 3250, "quoted_at": "2026-10-11T16:00:00+08:00",
+        "store": "模拟门店（不对应真实餐厅）", "mode": "pickup"
+      }
+    }
+  ]
+}
