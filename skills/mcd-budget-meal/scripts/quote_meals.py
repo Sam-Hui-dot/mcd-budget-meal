@@ -10,7 +10,8 @@ from pathlib import Path
 
 from compare_meals import (amount_cents, check_preferences, compare, constraints,
                            integer, markdown, meal_items, strings, text_value)
-from mcp_query import Client, authorization, structured_result
+from mcp_query import Client, authorization, error_message, structured_result
+from report_meals import html_report
 
 SCRIPT_ROOT = Path(__file__).resolve().parent
 SKILL_ROOT = SCRIPT_ROOT.parent
@@ -272,16 +273,21 @@ def run(plan, client, records_dir=None, now=None):
         except Exception as exc:
             stopped = True
             # Never include arbitrary remote exception strings or raw request data in public output.
-            reason = str(exc) if isinstance(exc, ValueError) else "请求中断；检查本机配置、参数或网络后另开一轮"
+            reason = error_message(exc)
             clean["quote"] = {"status": "error", "reason": reason}
         normalized["candidates"].append(clean)
-    return normalized, compare(normalized, now=now), stopped
+    result = compare(normalized, now=now)
+    if records_dir:
+        (records_dir / "comparison.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+        (records_dir / "meal-report.html").write_text(html_report(result, now), encoding="utf-8")
+    return normalized, result, stopped
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("plan", type=Path, help="Private JSON plan prepared from current menu/detail")
     parser.add_argument("--use-workbuddy-config", action="store_true")
+    parser.add_argument("--server-key", help="Explicit official connector key when multiple are configured")
     parser.add_argument("--records-dir", type=Path, help="Fresh subdirectory under this project's private/")
     parser.add_argument("--format", choices=("markdown", "json"), default="markdown")
     parser.add_argument("--check-plan", action="store_true", help="Validate basket/preferences locally; no token or network")
@@ -296,7 +302,9 @@ def main():
         return 0
     if plan["data_kind"] != "live":
         raise ValueError("模拟计划禁止联网；请由当前真实菜单构造 live 计划")
-    _, result, stopped = run(plan, Client(authorization(args.use_workbuddy_config)), args.records_dir)
+    if args.server_key and not args.use_workbuddy_config:
+        raise ValueError("--server-key需与--use-workbuddy-config一起使用。")
+    _, result, stopped = run(plan, Client(authorization(args.use_workbuddy_config, args.server_key)), args.records_dir)
     print(json.dumps(result, ensure_ascii=False, indent=2) if args.format == "json" else markdown(result), end="\n")
     return 1 if stopped or not result["summary"]["valid_distinct"] else 0
 
@@ -306,6 +314,6 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except Exception as exc:
-        message = str(exc) if isinstance(exc, ValueError) else "处理已停止，请检查本机计划、配置或网络；没有自动重试"
+        message = error_message(exc)
         print(json.dumps({"error_type": type(exc).__name__, "message": message}, ensure_ascii=False), file=sys.stderr)
         sys.exit(2)

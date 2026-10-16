@@ -18,6 +18,8 @@ python skills/mcd-budget-meal/scripts/quote_meals.py private/meal-plan.json --us
 
 默认从 `MCD_MCP_TOKEN` 环境变量取得认证。本机已配置 WorkBuddy 的用户可以显式使用 `--use-workbuddy-config`，读取 `~/.workbuddy/mcp.json` 中现有的 mcd-mcp 认证。凭证不传入命令行、不打印、不保存到响应文件。
 
+2026年10月16日起按官方地址匹配连接器，键名不要求为 `mcd-mcp`；匹配多个连接器时使用 `--server-key`选择。批量入口已完成三份真实核价及换饮料重新核价，并自动生成餐单报告，见[本轮记录](../../../examples/verified-run-2026-10-16.md)。
+
 在仓库根目录获取当前核价 schema：
 
 ```powershell

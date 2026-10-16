@@ -43,6 +43,10 @@ python skills/mcd-budget-meal/scripts/quote_meals.py private/meal-plan.json --us
 
 每一轮使用新的空记录目录，避免覆盖旧证据。记录目录按脚本所在位置确定：从仓库副本运行时写到仓库 `private/`；技能单独安装在 `~/.workbuddy/skills/mcd-budget-meal` 之类的技能目录时，写到该技能自己的 `private/`，不会写到技能目录之外。不指定记录目录也可以比较，但仅有请求摘要，没有落盘的原始返回，不应把摘要当作服务端调用凭证。设置环境变量 `MCD_MCP_TOKEN`时可省略 `--use-workbuddy-config`。
 
+指定记录目录后，还自动生成 `comparison.json` 和可独立打开的 `meal-report.html`。后者只提取成功餐单的展示字段，不嵌入原始请求、认证、券实例编码或本机记录路径。失败候选只显示未纳入数量，具体原因看本机JSON。报告可调预算并比较差价，超过本地15分钟期限后提示重新核价；不请求网络。[完整报告说明](../../../docs/report-guide.md)
+
+WorkBuddy连接器按官方地址匹配，不要求固定名称；多个连接器匹配时，加 `--server-key 你的连接器键名`。
+
 ## 失败规则与输出
 
 1. 本地计划有冲突或组成不一致：整个计划拒绝，在认证和业务调用前修正；错误信息标明是哪一份候选（`候选 <id>：<原因>`），便于只改那一份。

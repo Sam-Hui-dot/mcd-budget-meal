@@ -187,3 +187,11 @@ C:\Users\Sam\Documents\Codex\2026-10-08\ai-david\mcd-budget-meal
 Codex使用内置imagegen生成原创餐食插画，完成封面、信息徽章、历史案例图、流程图、README导航与离线预览页样式。预览页原JavaScript逻辑和核心Skill/Python脚本保持不变。设计方向及实际生成提示词保存在 `docs/visual-design.md` 与 `assets/imagegen-prompt.txt`。
 
 设计后27项Python离线回归及13组模拟DOM场景通过；现有Edge插件完成桌面与375/320 CSS像素容器检查、14.90元预算同步及素材加载检查。README首屏在本地近似GitHub排版中检查，尚未在公开仓库发布。这段是Codex后续工作记录，不属于WorkBuddy完成的设计或验证。
+
+### 后续功能完善（Codex，2026年10月16日）
+
+需求摘要：将交互页面接入每轮真实核价结果，增加餐品差价说明，改善首次使用的错误提示，并准备静态在线体验入口。
+
+Codex新增报告生成模块与共享模板，批量入口可自动生成比较JSON和HTML；完善连接器选择及认证、限流、网络错误提示。42项Python离线回归及13组模拟DOM场景通过；Edge插件检查预算输入、饮料切换、手动结果文本与窄屏布局。系统剪贴板内容未独立确认。
+
+经用户明确授权，使用现有本机认证完成当日三份真实核价与一次换饮料重核价，并生成实际报告；公开摘要见 `examples/verified-run-2026-10-16.md`。本轮没有WorkBuddy新增开发工作；上述实现与验证均由Codex完成。发布沿用原仓库与报名Issue，在线体验使用GitHub Pages。

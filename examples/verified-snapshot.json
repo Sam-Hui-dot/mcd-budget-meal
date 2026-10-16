@@ -1,0 +1,22 @@
+{
+  "kind": "snapshot",
+  "store": "麦当劳深圳南科大餐厅",
+  "storeCode": "1421119",
+  "window": "2026-10-11 16:17–16:20 +08:00",
+  "couponNote": "当次门店可用券查询结果为空",
+  "mode": "到店取餐",
+  "initialBudgetCents": 3000,
+  "meals": [
+    {"title":"人气经典随心配","variants":[
+      {"label":"阳光柠檬红茶 中杯","payableCents":1490,"conditions":["当次未使用优惠券"],"items":[
+        {"name":"双层吉士汉堡","qty":1},{"name":"阳光柠檬红茶（中杯）","qty":1}]}]},
+    {"title":"大堡口福三件套","variants":[
+      {"label":"可乐 中杯","payableCents":2290,"conditions":["当次未使用优惠券"],"items":[
+        {"name":"Hold不住鸡排堡（椒盐风味）","qty":1},{"name":"中薯条","qty":1},{"name":"可乐（中杯）","qty":1}]},
+      {"label":"无糖可口可乐 中杯 · 当次另行重新核价","payableCents":2290,"conditions":["换饮料后当次重新核价；未使用优惠券"],"items":[
+        {"name":"Hold不住鸡排堡（椒盐风味）","qty":1},{"name":"中薯条","qty":1},{"name":"无糖可口可乐（中杯）","qty":1}]}]},
+    {"title":"龙焰鸡腿堡三件套","variants":[
+      {"label":"可乐 中杯","payableCents":2690,"conditions":["当次未使用优惠券"],"items":[
+        {"name":"龙焰鸡腿堡","qty":1},{"name":"中薯条","qty":1},{"name":"可乐（中杯）","qty":1}]}]}
+  ]
+}

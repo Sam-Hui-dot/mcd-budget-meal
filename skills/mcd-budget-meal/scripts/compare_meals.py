@@ -90,6 +90,28 @@ def basket_key(items):
     return tuple(sorted((key, quantity) for key, quantity in quantities.items()))
 
 
+def basket_difference(first, second):
+    """Describe actual contents, without equating unlike burgers or valuing add-ons."""
+    def quantities(plan):
+        counts, names = Counter(), {}
+        for item in plan["items"]:
+            if not item.get("container", False):
+                key = (item["code"], item.get("option_key", ""))
+                counts[key] += item["quantity"]
+                names[key] = item["name"]
+        return counts, names
+    before, before_names = quantities(first)
+    after, after_names = quantities(second)
+    def rows(counts, names):
+        return [{"name": names[key], "quantity": count} for key, count in sorted(counts.items()) if count > 0]
+    return {"from_id": first["id"], "to_id": second["id"],
+            "from_title": first["title"], "to_title": second["title"],
+            "delta_cents": second["payable_cents"] - first["payable_cents"],
+            "added": rows(after - before, after_names), "removed": rows(before - after, before_names),
+            "unchanged": rows(before & after, before_names),
+            "conditions_changed": first["conditions"] != second["conditions"]}
+
+
 def constraints(data):
     """Parse explicit preferences once, before accepting any candidate."""
     required = {code: 1 for code in strings(data.get("required_codes", []), "required_codes")}
@@ -210,6 +232,7 @@ def compare(data, max_age_minutes=15, now=None):
     over = [item for item in unique if item["remaining_cents"] < 0]
     return {"data_kind": kind, "store": store, "mode": "pickup", "budget_cents": budget,
             "recommended": within[:3], "over_budget": over[:3], "excluded": excluded,
+            "differences": [basket_difference(a, b) for a, b in zip(unique, unique[1:])],
             "summary": {"submitted": len(candidates), "valid_distinct": len(unique),
                         "within_budget": len(within), "excluded": len(excluded)}}
 
@@ -256,6 +279,18 @@ def markdown(result):
         lines.extend(["## 未纳入比较", ""])
         lines.extend(f"- {cell(item['id'])}：{cell(item['reason'])}" for item in result["excluded"])
         lines.append("")
+    if result.get("differences"):
+        lines.extend(["## 差价与餐品变化", ""])
+        for difference in result["differences"]:
+            changes = []
+            for field, label in (("added", "增加"), ("removed", "减少"), ("unchanged", "保持")):
+                if difference[field]:
+                    changes.append(label + "：" + "；".join(f"{cell(item['name'])} ×{item['quantity']}" for item in difference[field]))
+            if difference["conditions_changed"]:
+                changes.append("优惠条件不同，请同时核对各餐单条件")
+            lines.append(f"- {cell(difference['from_title'])} → {cell(difference['to_title'])}："
+                         f"总价相差 {money(difference['delta_cents'])}；" + "。".join(changes) + "。")
+        lines.extend(["", "差价是两份完整餐单的总价差，不是新增餐品的单独售价。", ""])
     lines.append("比较范围为本轮候选；餐品、价格和可售状态以麦当劳官方结算结果为准。")
     return "\n".join(lines) + "\n"
 

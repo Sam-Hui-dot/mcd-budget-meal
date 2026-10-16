@@ -8,11 +8,17 @@
 
 ## 先看效果
 
+**[打开在线体验 →](https://sam-hui-dot.github.io/mcd-budget-meal/)**　免安装、免Token，调整预算、查看差价和已核价的饮料版本。页面使用历史核价记录，不实时查价或下单。
+
+[查看10月16日批量入口生成的真实报告](https://sam-hui-dot.github.io/mcd-budget-meal/example-report.html) · [报告使用说明](docs/report-guide.md)
+
 ![30元预算的三份历史餐单](assets/meal-comparison-v3.svg)
 
 这是2026年10月11日深圳南科大餐厅的一次真实核价记录，当次没有可用券。价格为历史快照，当前购买需要重新查询与核价。
 
-**想自己调预算？** 下载仓库后双击 [`docs/preview.html`](docs/preview.html)：不需要Token，可以调整预算、查看已核价的饮料版本、复制比较结果。页面是可独立打开的离线单文件；GitHub上的文件链接显示源码，请下载后打开。
+**想自己调预算？** 下载后双击 [10月16日批量入口生成的交互报告](docs/example-report.html)，可以调整预算、比较组成与差价、复制结果。也保留了 [10月11日历史预览](docs/preview.html)，可切换当次已核价的饮料版本。两者均免Token、可单文件打开；GitHub文件链接显示源码，需下载后打开。
+
+每次真实核价指定 `--records-dir` 后，也会自动生成属于你本轮结果的 `meal-report.html`，不再只依赖固定的示例页面。[新一轮真实运行记录](examples/verified-run-2026-10-16.md)
 
 ## 真实案例
 
@@ -54,6 +60,8 @@ AI负责理解需求、查询真实菜单和准备候选；官方 `calculate-pri
 - **预算以你的输入为准**：没有预算内方案时，列出最接近的有效餐单与超出金额。
 - **更换餐品后重新核价**：不拿旧报价加减菜单展示价。
 - **接口失败就停止本轮后续调用**：保留此前的有效结果，不自动重试。
+- **差价说清楚**：分别列出增加、减少与保持不变的餐品和份数；整单差价不当作新增餐品的单独售价。
+- **报告随本轮核价生成**：预算筛选、差价和复制使用本轮实际成功报价；失败候选不生成猜测价格。
 
 仅支持同一门店、单人、现在到店取餐，停在餐单建议阶段。比较只覆盖本轮候选，不保证全菜单最低价。营养、配料与过敏原未纳入推荐规则；价格、可售状态和券适用性以官方当前结果为准。
 
@@ -63,17 +71,20 @@ AI负责理解需求、查询真实菜单和准备候选；官方 `calculate-pri
 
 | 范围 | 已记录的验证 |
 |---|---|
-| 真实MCP运行 | 初版单工具直连路径完成三份核价及一次换饮料核价；日期2026-10-11 |
-| Python逻辑 | 27项纯离线回归，覆盖金额、份数、偏好、时效、去重与失败停止 |
-| 离线预览 | 13组模拟DOM逻辑场景；Edge中的实际输入、饮料切换、复制及窄屏布局检查 |
+| 真实MCP运行 | 2026-10-16批量入口完成三份核价、自动生成报告；另行换饮料核价成功。初版10月11日记录保留 |
+| Python逻辑 | 42项纯离线回归，覆盖原有预算检查、差价、报告字段筛选、HTML转义与错误诊断 |
+| 页面逻辑 | 新版13组模拟DOM场景通过，含复制拒绝、手动回退、异步旧结果清理与报价过期 |
 
-新增批量入口 `quote_meals.py` 尚未重新进行真实服务联调；安装脚本未实际安装验证。浏览器检查使用本机HTTP页面，文件双击打开时的专属剪贴板权限尚未实测。默认15分钟的报价新鲜度是项目自己的展示策略。
+带券分支尚无真实账户案例；安装脚本未实际安装验证。默认15分钟的报价新鲜度是项目自己的展示策略，过期报告保留记录并提示重新核价。[本轮验证与使用说明](docs/report-guide.md)
 
 纯离线回归：
 
 ```powershell
 python -B -m unittest discover -s tests -v
+node tests/check_report.cjs
 ```
+
+Node只用于页面开发验收，使用Skill和Python脚本不需要安装Node。
 
 查看模拟输出（以下数据为虚构示例）：
 
@@ -92,6 +103,8 @@ python skills/mcd-budget-meal/scripts/compare_meals.py examples/demo-quotes.json
 | [`skills/mcd-budget-meal/SKILL.md`](skills/mcd-budget-meal/SKILL.md) | 选店、候选准备与核价的对话流程 |
 | [`skills/mcd-budget-meal/scripts/quote_meals.py`](skills/mcd-budget-meal/scripts/quote_meals.py) | 最多三份候选的请求校验、官方核价与预算比较 |
 | [`skills/mcd-budget-meal/scripts/compare_meals.py`](skills/mcd-budget-meal/scripts/compare_meals.py) | 不联网的金额与偏好检查、排序及Markdown输出 |
+| [`skills/mcd-budget-meal/scripts/report_meals.py`](skills/mcd-budget-meal/scripts/report_meals.py) | 把有效报价生成独立交互报告，只提取展示字段 |
+| [`docs/example-report.html`](docs/example-report.html) | 10月16日批量入口真实报价的报告示例 |
 | [`docs/preview.html`](docs/preview.html) | 历史核价效果预览，免Token |
 
 ## 许可与声明
