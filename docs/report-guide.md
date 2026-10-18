@@ -12,6 +12,8 @@ python skills/mcd-budget-meal/scripts/quote_meals.py private/meal-plan.json --us
 
 只有本轮通过金额、组成与偏好检查的报价进入页面；之前成功而后续失败时，报告保留成功结果，并标明未纳入数量。具体失败原因留在本机比较JSON和终端输出。全部失败时显示没有有效报价，不填零元餐单。
 
+HTML模板缺失或报告写入失败时，有效报价仍会正常输出，只增加本地导出提示；比较JSON会独立尝试保存。JSON写入失败时也不会把已有报价标成无效，应保留终端输出。导出故障不触发重新核价，业务接口失败的停止规则保持不变。
+
 页面只比较已有完整报价。更换餐品仍须重新调用官方核价；调预算不生成新组合。超过本项目15分钟比较期限后，真实报告会提示重新核价，并保留历史记录供查看。这个期限不是官方报价承诺。
 
 ## 差价怎么看
@@ -45,6 +47,20 @@ python skills/mcd-budget-meal/scripts/report_meals.py private/live-quotes.json -
 ```
 
 这个输入采用 [本地报价格式](../skills/mcd-budget-meal/references/quote-format.md)，不是未经处理的官方响应或 `comparison.json`。默认拒绝过期live报价；已生成报告本身可以作为历史记录查看。目标文件已存在时拒绝覆盖。
+
+恢复批量入口已经保存的 `comparison.json`，使用独立的历史恢复模式：
+
+```powershell
+python skills/mcd-budget-meal/scripts/report_meals.py private/run-001/comparison.json --from-comparison --output private/restored-report.html
+```
+
+该模式不联网、不读取认证；重新检查金额、组成格式和时间，按保存的预算重新计算余量，保留原核价时间。页面明确标注“历史比较结果 · 未重新核价”，不把旧记录恢复成当前售价。它不能验证本地文件是否被改动，也不能补出保存结果中未包含的原始调用或偏好约束。目标文件存在时仍拒绝覆盖。
+
+## 安装和升级
+
+`install.ps1`先在用户技能目录内暂存干净的新版本，忽略源包里的 `private/`、Python缓存和`.pyc`；已有技能中的 `private/`记录会保留到新版本。随后将完整旧技能移动到 `~/.workbuddy/skill-backups/`，再切换新目录，避免覆盖合并留下废弃程序文件。切换失败时恢复旧技能；未完成的暂存目录保留供检查，不自动删除旧版本。
+
+通常直接运行 `./install.ps1`。`-ProfileDirectory`用于显式指定配置根目录；离线验收使用临时目录，不修改系统HOME、连接器或真实用户配置。真实WorkBuddy的技能发现仍须在用户客户端新开会话后确认。
 
 ## 2026年10月16日验证
 

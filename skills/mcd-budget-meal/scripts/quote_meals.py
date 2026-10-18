@@ -278,8 +278,19 @@ def run(plan, client, records_dir=None, now=None):
         normalized["candidates"].append(clean)
     result = compare(normalized, now=now)
     if records_dir:
-        (records_dir / "comparison.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-        (records_dir / "meal-report.html").write_text(html_report(result, now), encoding="utf-8")
+        # Presentation/export failures must never erase successful official quotes.
+        warnings = []
+        try:
+            page = html_report(result, now)
+            (records_dir / "meal-report.html").write_text(page, encoding="utf-8")
+        except Exception:
+            warnings.append("HTML报告未生成；有效报价仍保留。请检查本机报告模板和目录写入权限，可稍后从comparison.json恢复。")
+        if warnings:
+            result["warnings"] = warnings
+        try:
+            (records_dir / "comparison.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception:
+            result.setdefault("warnings", []).append("比较JSON未保存；请保留终端输出并检查目录写入权限。已有报价未因此失效。")
     return normalized, result, stopped
 
 

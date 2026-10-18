@@ -46,5 +46,7 @@ async function flush(){await new Promise(resolve=>setImmediate(resolve));}
   const empty=structuredClone(data);empty.meals=[];empty.kind='demo';const f=create({data:empty});assert.match(f.el('summary').innerHTML,/没有有效报价/);assert.match(f.el('kindLabel').textContent,/模拟/);checks++;
   const g=create({writeText:()=>Promise.resolve()});g.el('copyBtn').handlers.click();await flush();assert.match(g.el('copyStatus').textContent,/已复制/);checks++;
   g.el('showTextBtn').handlers.click();assert.equal(g.el('manualCopy').hidden,false);assert.match(g.el('manualCopyText').value,/总价相差 ¥4.00/);assert.match(g.el('manualCopyText').value,/预算：¥30.00/);assert.ok(g.el('manualCopyText').value.includes('\n| 方案 |'));checks++;
+  const archived=structuredClone(live);archived.historical=true;
+  const h=create({data:archived});assert.match(h.el('kindLabel').textContent,/历史比较结果/);assert.match(h.el('freshness').textContent,/没有发出新请求/);assert.match(h.api.resultText(),/未重新核价/);checks++;
   console.log(`${checks} offline report logic scenarios passed (mock DOM).`);
 })().catch(error=>{console.error(error);process.exitCode=1;});

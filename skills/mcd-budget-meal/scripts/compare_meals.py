@@ -161,7 +161,7 @@ def check_preferences(items, rules):
             raise ValueError(f"{group['name']} 至少 {group['minimum']} 份，实际 {count} 份")
 
 
-def compare(data, max_age_minutes=15, now=None):
+def compare(data, max_age_minutes=15, now=None, *, historical=False):
     if not isinstance(data, dict):
         raise ValueError("输入根节点必须是对象")
     kind = data.get("data_kind")
@@ -211,7 +211,7 @@ def compare(data, max_age_minutes=15, now=None):
             age = (now - timestamp).total_seconds()
             if kind == "live" and age < -60:
                 raise ValueError("核价时间在未来，请检查时钟")
-            if kind == "live" and age > max_age_minutes * 60:
+            if kind == "live" and not historical and age > max_age_minutes * 60:
                 raise ValueError("核价时间已超过本地比较期限，请重新核价")
             accepted.append({"id": label, "title": title, "items": items,
                              "conditions": conditions, "payable_cents": payable,
@@ -291,6 +291,10 @@ def markdown(result):
             lines.append(f"- {cell(difference['from_title'])} → {cell(difference['to_title'])}："
                          f"总价相差 {money(difference['delta_cents'])}；" + "。".join(changes) + "。")
         lines.extend(["", "差价是两份完整餐单的总价差，不是新增餐品的单独售价。", ""])
+    if result.get("warnings"):
+        lines.extend(["## 本地导出提示", ""])
+        lines.extend("- " + cell(warning) for warning in result["warnings"])
+        lines.append("")
     lines.append("比较范围为本轮候选；餐品、价格和可售状态以麦当劳官方结算结果为准。")
     return "\n".join(lines) + "\n"
 

@@ -18,7 +18,7 @@ def safe_integer(value, field):
     return value
 
 
-def report_data(result, now=None):
+def report_data(result, now=None, *, historical=False):
     """Explicit display-field allowlist: no requests, references, coupons or headers."""
     if result.get("data_kind") not in ("live", "demo") or result.get("mode") != "pickup":
         raise ValueError("报告需要live/demo到店取餐比较结果")
@@ -35,9 +35,9 @@ def report_data(result, now=None):
         price = safe_integer(plan["payable_cents"], "应付金额")
         meals.append({"id": str(position), "title": text_value(plan["title"], "餐单标题"), "variants": [{
             "id": "quoted", "label": "本轮已核价组合", "tagline": "更换餐品后需要重新核价",
-            "payableCents": price, "sourceNote": "模拟价格" if result["data_kind"] == "demo" else "本轮官方核价整理",
+            "payableCents": price, "sourceNote": "保存的历史比较结果" if historical else "模拟价格" if result["data_kind"] == "demo" else "本轮官方核价整理",
             "quotedAt": timestamp, "conditions": strings(plan["conditions"], "优惠条件"), "items": visible}]})
-    return {"kind": result["data_kind"], "store": text_value(result["store"], "门店"), "storeCode": "",
+    return {"kind": result["data_kind"], "historical": historical, "store": text_value(result["store"], "门店"), "storeCode": "",
             "window": "各餐单时间见卡片", "couponNote": "优惠条件见各餐单", "mode": "到店取餐",
             "initialBudgetCents": safe_integer(result["budget_cents"], "预算"), "meals": meals,
             "generatedAt": (now or datetime.now(timezone.utc)).isoformat(),
@@ -92,15 +92,51 @@ def render(data):
     return template.replace(MARKER, serialized)
 
 
-def html_report(result, now=None):
-    return render(report_data(result, now))
+def html_report(result, now=None, *, historical=False):
+    return render(report_data(result, now, historical=historical))
+
+
+def restore_comparison(source, now=None):
+    """Recheck saved display data; never redate it or contact the official service."""
+    if not isinstance(source, dict):
+        raise ValueError("保存的比较结果必须是JSON对象")
+    candidates = []
+    for key in ("recommended", "over_budget"):
+        rows = source.get(key)
+        if not isinstance(rows, list):
+            raise ValueError("保存的比较结果缺少餐单数组：" + key)
+        for row in rows:
+            if not isinstance(row, dict):
+                raise ValueError("保存的餐单必须是对象")
+            price = safe_integer(row.get("payable_cents"), "应付金额")
+            candidates.append({"id": row.get("id"), "title": row.get("title"),
+                "items": row.get("items"), "conditions": row.get("conditions", []),
+                "quote": {"status": "ok", "tool": "calculate-price", "store": source.get("store"),
+                    "mode": source.get("mode"), "currency": "CNY", "source_amount": price,
+                    "source_unit": "cent", "payable_cents": price, "quoted_at": row.get("quoted_at"),
+                    "source_ref": "local-saved-comparison", "amount_field": "saved.payable_cents"}})
+    if not 1 <= len(candidates) <= 6:
+        raise ValueError("保存的比较结果需要1–6份有效餐单；空结果不能恢复为报价")
+    restored = compare({"data_kind": source.get("data_kind"), "store": source.get("store"),
+        "mode": source.get("mode"), "budget_cents": source.get("budget_cents"),
+        "candidates": candidates}, now=now, historical=True)
+    if restored["excluded"]:
+        raise ValueError("保存的餐单未通过金额、时间、组成或唯一性检查，停止恢复")
+    excluded = source.get("excluded", [])
+    if not isinstance(excluded, list):
+        raise ValueError("保存的excluded必须是数组")
+    # Preserve only the count; raw reasons are not copied into the HTML.
+    restored["excluded"] = [{} for _ in excluded]
+    return restored
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input", type=Path)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--snapshot", action="store_true", help="Render reviewed public historical display data")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--snapshot", action="store_true", help="Render reviewed public historical display data")
+    mode.add_argument("--from-comparison", action="store_true", help="Restore saved comparison.json as an explicitly historical report")
     args = parser.parse_args()
     source = json.loads(args.input.read_text(encoding="utf-8-sig"))
     if args.snapshot:
@@ -109,7 +145,7 @@ def main():
     else:
         from quote_meals import private_path
         output = private_path(args.output)
-        page = html_report(compare(source))
+        page = html_report(restore_comparison(source), historical=True) if args.from_comparison else html_report(compare(source))
     output.parent.mkdir(parents=True, exist_ok=True)
     # Refuse to overwrite a previous report or evidence file.
     with output.open("x", encoding="utf-8") as stream:
