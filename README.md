@@ -2,7 +2,9 @@
 
 ![Python 3.10+](assets/badges/python.svg) ![零第三方依赖](assets/badges/stdlib.svg) ![离线预览免Token](assets/badges/preview.svg) ![MCP官方核价](assets/badges/mcp.svg) ![MIT许可](assets/badges/license.svg)
 
-**输入预算和想吃的餐品，把官方核价后的餐单放在一起选。**
+**预算你来定，餐单摆出来，多花的钱看明白。**
+
+一句话说需求 → 官方核价 → 三份餐单对比。看整单价格，也看差价换来了什么。
 
 [先看效果](#先看效果) · [真实案例](#真实案例) · [安装使用](#安装使用) · [如何工作](#如何工作) · [验证记录](#验证记录)
 
@@ -10,15 +12,15 @@
 
 **[打开在线体验 →](https://sam-hui-dot.github.io/mcd-budget-meal/)**　免安装、免Token，调整预算、查看差价和已核价的饮料版本。页面使用历史核价记录，不实时查价或下单。
 
-[查看10月16日批量入口生成的真实报告](https://sam-hui-dot.github.io/mcd-budget-meal/example-report.html) · [报告使用说明](docs/report-guide.md)
+[打开批量核价报告示例](https://sam-hui-dot.github.io/mcd-budget-meal/example-report.html) · [报告使用说明](docs/report-guide.md)
 
 ![30元预算的三份历史餐单](assets/meal-comparison-v3.svg)
 
-这是2026年10月11日深圳南科大餐厅的一次真实核价记录，当次没有可用券。价格为历史快照，当前购买需要重新查询与核价。
+这是一次真实核价的脱敏案例，当次没有可用券。门店与核价时段不公开；价格为历史快照，当前购买需要重新查询与核价。
 
-**想自己调预算？** 下载后双击 [10月16日批量入口生成的交互报告](docs/example-report.html)，可以调整预算、比较组成与差价、复制结果。也保留了 [10月11日历史预览](docs/preview.html)，可切换当次已核价的饮料版本。两者均免Token、可单文件打开；GitHub文件链接显示源码，需下载后打开。
+**想自己调预算？** 下载后双击 [脱敏交互报告](docs/example-report.html)，可以调整预算、比较组成与差价、复制结果。也保留了 [饮料切换预览](docs/preview.html)，可切换当次已核价的饮料版本。两者均免Token、可单文件打开；GitHub文件链接显示源码，需下载后打开。
 
-每次真实核价指定 `--records-dir` 后，也会自动生成属于你本轮结果的 `meal-report.html`，不再只依赖固定的示例页面。[新一轮真实运行记录](examples/verified-run-2026-10-16.md)
+每次真实核价指定 `--records-dir` 后，也会自动生成属于你本轮结果的 `meal-report.html`，不再只依赖固定的示例页面。[新一轮真实运行记录](examples/batch-verification.md)
 
 ## 真实案例
 
@@ -71,7 +73,7 @@ AI负责理解需求、查询真实菜单和准备候选；官方 `calculate-pri
 
 | 范围 | 已记录的验证 |
 |---|---|
-| 真实MCP运行 | 2026-10-16批量入口完成三份核价、自动生成报告；另行换饮料核价成功。初版10月11日记录保留 |
+| 真实MCP运行 | 批量入口完成三份核价、自动生成报告；另行换饮料核价成功。公开摘要已脱敏 |
 | Python逻辑 | 51项纯离线回归，含导出失败保留有效报价、旧比较JSON恢复及原有预算检查 |
 | 页面逻辑 | 14组模拟DOM场景通过，含复制回退、旧结果清理、报价过期与历史恢复标注 |
 | 安装升级 | 临时配置目录14项检查通过，含去除旧文件、保留私人记录与替换失败恢复旧版 |
@@ -94,7 +96,7 @@ Node只用于页面开发验收，使用Skill和Python脚本不需要安装Node�
 python skills/mcd-budget-meal/scripts/compare_meals.py examples/demo-quotes.json
 ```
 
-公开配置 [`mcp-config.example.json`](mcp-config.example.json) 仅含 `${MCD_MCP_TOKEN}` 占位符。真实凭证、原始响应和个人信息只保存在本机私有目录，不上传仓库。
+公开配置 [`mcp-config.example.json`](mcp-config.example.json) 仅含 `${MCD_MCP_TOKEN}` 占位符。真实凭证和原始响应保存在本机私有目录。公开案例隐藏门店和核价时段；自己生成的私人报告仍含本轮门店、餐品与时间，分享前请先脱敏。
 
 [版本说明](CHANGELOG.md) · [WorkBuddy实际参与记录](workbuddy.md) · [本轮视觉设计与插画说明](docs/visual-design.md)
 

@@ -1,6 +1,6 @@
 # v0.2升级说明
 
-此文记录2026年10月11日v0.2的状态。2026年10月16日的批量入口真实验证及报告功能见[报告说明](report-guide.md)和[本轮真实摘要](../examples/verified-run-2026-10-16.md)。
+此文记录v0.2的历史状态。后续批量入口真实验证及报告功能见[报告说明](report-guide.md)和[本轮真实摘要](../examples/batch-verification.md)。
 
 ## 用户得到的变化
 

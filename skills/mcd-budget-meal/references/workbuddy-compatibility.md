@@ -1,6 +1,6 @@
 # WorkBuddy 核价兼容性：使用已验证的直连路径
 
-2026年10月11日，WorkBuddy 的延迟工具入口报告 `/items: must be array`。设置工具级 `defer_loading: false` 后，该次运行仍走延迟入口。因此无需反复改配置或重启。
+早期真实运行中，WorkBuddy 的延迟工具入口报告 `/items: must be array`。设置工具级 `defer_loading: false` 后，该次运行仍走延迟入口。因此无需反复改配置或重启。
 
 随后将同一份餐单参数直接发到官方 MCP，核价成功返回2690分。项目已增加零依赖的 `scripts/mcp_query.py`；三份餐单核价、预算比较与一次饮料替换核价均成功，保留原版功能。
 
@@ -18,7 +18,7 @@ python skills/mcd-budget-meal/scripts/quote_meals.py private/meal-plan.json --us
 
 默认从 `MCD_MCP_TOKEN` 环境变量取得认证。本机已配置 WorkBuddy 的用户可以显式使用 `--use-workbuddy-config`，读取 `~/.workbuddy/mcp.json` 中现有的 mcd-mcp 认证。凭证不传入命令行、不打印、不保存到响应文件。
 
-2026年10月16日起按官方地址匹配连接器，键名不要求为 `mcd-mcp`；匹配多个连接器时使用 `--server-key`选择。批量入口已完成三份真实核价及换饮料重新核价，并自动生成餐单报告，见[本轮记录](../../../examples/verified-run-2026-10-16.md)。
+目前按官方地址匹配连接器，键名不要求为 `mcd-mcp`；匹配多个连接器时使用 `--server-key`选择。批量入口已完成三份真实核价及换饮料重新核价，并自动生成餐单报告，见[本轮记录](../../../examples/batch-verification.md)。
 
 在仓库根目录获取当前核价 schema：
 

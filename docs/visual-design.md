@@ -15,7 +15,7 @@
 - `assets/meal-illustration-v3.png`：内置imagegen生成的原创透明底插画，不代表具体在售餐品。
 - `assets/cover-layout-v3.svg`：代码排版的可编辑封面源文件。
 - `assets/cover-v3.jpg`：封面源文件的浏览器导出图，用于GitHub README。
-- `assets/meal-comparison-v3.svg`：仅使用2026-10-11公开历史核价记录的效果展示图。
+- `assets/meal-comparison-v3.svg`：使用脱敏历史核价记录的效果展示图，不公开门店与核价时段。
 - `assets/badges/`：本地信息徽章。未设CI，因此不展示自动测试通过徽章。
 - `docs/preview.html`：插画嵌入页面，可单文件离线打开。
 
