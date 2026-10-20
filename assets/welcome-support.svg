@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="430" viewBox="0 0 1400 430" role="img" aria-labelledby="title desc">
+  <title id="title">欢迎来麦麦预算餐坐坐</title>
+  <desc id="desc">愿每一餐都合心意，每一份预算都花得明白。欢迎体验、反馈与分享；觉得有用，欢迎在 GitHub 点一颗 Star。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#211914"/><stop offset="1" stop-color="#4b2b1c"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#ffcf59" stop-opacity=".2"/><stop offset="1" stop-color="#ffcf59" stop-opacity="0"/></radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe9a4"/><stop offset="1" stop-color="#efb731"/></linearGradient>
+  </defs>
+  <rect width="1400" height="430" rx="26" fill="url(#bg)"/>
+  <circle cx="1180" cy="128" r="240" fill="url(#glow)"/>
+  <g fill="none" stroke="#f1cc7c" stroke-opacity=".16">
+    <circle cx="1180" cy="130" r="108"/><circle cx="1180" cy="130" r="147"/>
+    <path d="M1025 130h310M1180 0v275" stroke-dasharray="3 10"/>
+  </g>
+  <path d="m1180 56 22 45 50 7-36 35 9 50-45-24-45 24 9-50-36-35 50-7z" fill="url(#gold)"/>
+  <g fill="#ffdf8a"><path d="m1041 54 3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/><path d="m1320 202 3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/><circle cx="1306" cy="58" r="3"/><circle cx="1064" cy="210" r="3"/></g>
+  <g font-family="Microsoft YaHei, PingFang SC, sans-serif">
+    <text x="54" y="59" font-size="15" fill="#d9b67c" letter-spacing="3">A LITTLE TOOL. A WARM WELCOME.</text>
+    <text x="54" y="126" font-size="44" fill="#fff5df" font-weight="800">欢迎来坐坐，今天也要好好吃饭。</text>
+    <text x="54" y="174" font-size="22" fill="#e0cbb0">愿每一餐都合心意，每一份预算都花得明白。</text>
+    <text x="54" y="218" font-size="19" fill="#c7aa8a">一条建议、一次分享、一颗 Star，都是继续打磨它的动力。</text>
+    <rect x="54" y="264" width="418" height="117" rx="16" fill="#fff5df"/>
+    <text x="77" y="301" font-size="15" fill="#947044" letter-spacing="2">01 / TRY IT</text>
+    <text x="77" y="337" font-size="26" fill="#38271c" font-weight="700">先体验，看看合不合用</text>
+    <text x="77" y="363" font-size="16" fill="#7f6953">免安装预览，拖一拖预算就能看</text>
+    <rect x="491" y="264" width="418" height="117" rx="16" fill="#fff5df" fill-opacity=".06" stroke="#9d7850"/>
+    <text x="514" y="301" font-size="15" fill="#d4b47b" letter-spacing="2">02 / MAKE IT BETTER</text>
+    <text x="514" y="337" font-size="26" fill="#fff5df" font-weight="700">有想法，就来聊聊</text>
+    <text x="514" y="363" font-size="16" fill="#d5bea0">问题、建议和代码贡献都欢迎</text>
+    <rect x="928" y="264" width="418" height="117" rx="16" fill="#ffcf59"/>
+    <text x="951" y="301" font-size="15" fill="#80602c" letter-spacing="2">03 / PASS IT ON</text>
+    <text x="951" y="337" font-size="26" fill="#38271c" font-weight="700">觉得有用？点颗 Star ★</text>
+    <text x="951" y="363" font-size="16" fill="#72542d">也欢迎分享给正在纠结吃什么的人</text>
+  </g>
+</svg>

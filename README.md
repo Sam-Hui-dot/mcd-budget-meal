@@ -6,7 +6,14 @@
 
 一句话说需求 → 官方核价 → 三份餐单对比。看整单价格，也看差价换来了什么。
 
-[先看效果](#先看效果) · [真实案例](#真实案例) · [安装使用](#安装使用) · [如何工作](#如何工作) · [验证记录](#验证记录)
+[先看效果](#先看效果) · [真实案例](#真实案例) · [安装使用](#安装使用) · [如何工作](#如何工作) · [欢迎与支持](#欢迎与支持)
+
+<p align="center">
+  欢迎路过，也欢迎常来。愿你今天吃得开心，手头的事情也顺顺利利。<br>
+  <a href="https://sam-hui-dot.github.io/mcd-budget-meal/"><b>🍔 先体验一下</b></a> ·
+  <a href="https://github.com/Sam-Hui-dot/mcd-budget-meal/issues">💬 留个建议</a> ·
+  <a href="https://github.com/Sam-Hui-dot/mcd-budget-meal"><b>⭐ 喜欢的话，点颗 Star</b></a>
+</p>
 
 ## 先看效果
 
@@ -108,8 +115,25 @@ python skills/mcd-budget-meal/scripts/compare_meals.py examples/demo-quotes.json
 | [`skills/mcd-budget-meal/scripts/quote_meals.py`](skills/mcd-budget-meal/scripts/quote_meals.py) | 最多三份候选的请求校验、官方核价与预算比较 |
 | [`skills/mcd-budget-meal/scripts/compare_meals.py`](skills/mcd-budget-meal/scripts/compare_meals.py) | 不联网的金额与偏好检查、排序及Markdown输出 |
 | [`skills/mcd-budget-meal/scripts/report_meals.py`](skills/mcd-budget-meal/scripts/report_meals.py) | 把有效报价生成独立交互报告，只提取展示字段 |
-| [`docs/example-report.html`](docs/example-report.html) | 10月16日批量入口真实报价的报告示例 |
+| [`docs/example-report.html`](docs/example-report.html) | 批量入口真实报价的脱敏报告示例 |
 | [`docs/preview.html`](docs/preview.html) | 历史核价效果预览，免Token |
+
+## 欢迎与支持
+
+![欢迎来麦麦预算餐坐坐：体验、反馈与分享](assets/welcome-support.svg)
+
+做这个小工具，是希望“预算多少、想吃什么”能更容易得到一个明白的答案。谢谢你愿意花时间看看它，也希望它能帮你少一点纠结，多一点好好吃饭的轻松。
+
+| 来做点什么 | 从这里开始 |
+|---|---|
+| **先试试效果** | [打开免安装体验](https://sam-hui-dot.github.io/mcd-budget-meal/)，调整预算、看看餐单差价 |
+| **告诉我哪里还能更好** | [提交 Issue](https://github.com/Sam-Hui-dot/mcd-budget-meal/issues)，聊聊使用感受、问题或想要的功能 |
+| **一起动手改进** | 欢迎提交 PR；修一个小问题、补一段说明也很有帮助 |
+| **让更多人发现它** | 分享 [仓库链接](https://github.com/Sam-Hui-dot/mcd-budget-meal) 或 [在线体验](https://sam-hui-dot.github.io/mcd-budget-meal/)，喜欢的话点亮右上角的 **Star ⭐** |
+
+每一次真实的使用和反馈，都是继续改进的动力。分享问题时，记得隐藏 Token、手机号、门店位置和核价时段。
+
+<p align="center"><b>谢谢你的支持。祝你每一餐都合心意，想做的事也一点点有进展。🍟</b></p>
 
 ## 许可与声明
 
