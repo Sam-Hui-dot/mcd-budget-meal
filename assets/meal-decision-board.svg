@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1010" viewBox="0 0 1400 1010" role="img" aria-labelledby="title desc">
+  <title id="title">一顿饭，看清三件事：价格、预算余量、餐品差异</title>
+  <desc id="desc">真实批量核价历史案例，门店与核价时段已脱敏。30元预算，三份餐单分别14.90、22.90、26.90元。第一份双层吉士汉堡和中杯可乐；第二份鸡排堡、中薯条、中杯可乐；第三份龙焰鸡腿堡、中薯条、中杯可乐。前两份整单差8元，换汉堡并增加薯条；后两份差4元，只换汉堡。不是单品售价。</desc>
+  <defs>
+    <linearGradient id="paper" x2="1" y2="1"><stop stop-color="#fffaf0"/><stop offset="1" stop-color="#f3e9d5"/></linearGradient>
+    <linearGradient id="coffee" x2="1" y2="1"><stop stop-color="#35261e"/><stop offset="1" stop-color="#201913"/></linearGradient>
+  </defs>
+  <rect width="1400" height="1010" rx="26" fill="url(#paper)"/>
+  <g font-family="Microsoft YaHei, PingFang SC, Noto Sans CJK SC, sans-serif">
+    <text x="48" y="51" font-size="16" letter-spacing="3" fill="#886e50">THE MEAL / THE BUDGET / THE DIFFERENCE</text>
+    <text x="48" y="110" font-size="42" font-weight="700" fill="#30231b">看清一顿饭，再做个选择。</text>
+    <text x="48" y="151" font-size="22" fill="#705e4b">同一门店 · 到店取餐 · 预算 ¥30.00 · 当次无可用券</text>
+    <rect x="1146" y="46" width="206" height="40" rx="20" fill="#e9dfc9"/>
+    <circle cx="1170" cy="66" r="5" fill="#987e59"/>
+    <text x="1186" y="73" font-size="18" fill="#68553f">脱敏历史核价</text>
+    <rect x="48" y="190" width="418" height="350" rx="20" fill="#fffdf8" stroke="#dfd3bb"/>
+    <rect x="491" y="190" width="418" height="350" rx="20" fill="#fffdf8" stroke="#dfd3bb"/>
+    <rect x="934" y="190" width="418" height="350" rx="20" fill="#fffdf8" stroke="#dfd3bb"/>
+    <rect x="72" y="214" width="42" height="30" rx="9" fill="#ffc72c"/>
+    <text x="93" y="235" text-anchor="middle" font-size="16" font-weight="700" fill="#483017">01</text>
+    <text x="127" y="236" font-size="18" fill="#7c654c">汉堡 + 饮料</text>
+    <text x="72" y="286" font-size="28" font-weight="700" fill="#30231b">人气经典随心配</text>
+    <text x="72" y="326" font-size="22" fill="#6b5845">双层吉士汉堡</text>
+    <text x="72" y="361" font-size="22" fill="#6b5845">可乐中杯</text>
+    <path d="M72 389H442" stroke="#ded2ba" stroke-dasharray="4 6"/>
+    <text x="72" y="454" font-size="56" font-weight="700" fill="#256947">¥14.90</text>
+    <rect x="72" y="483" width="212" height="34" rx="17" fill="#e9f0e4"/>
+    <text x="88" y="507" font-size="20" fill="#326547">预算剩余 ¥15.10</text>
+    <rect x="515" y="214" width="42" height="30" rx="9" fill="#ffc72c"/>
+    <text x="536" y="235" text-anchor="middle" font-size="16" font-weight="700" fill="#483017">02</text>
+    <text x="570" y="236" font-size="18" fill="#7c654c">汉堡 + 薯条 + 饮料</text>
+    <text x="515" y="286" font-size="28" font-weight="700" fill="#30231b">大堡口福三件套</text>
+    <text x="515" y="326" font-size="22" fill="#6b5845">Hold不住鸡排堡（椒盐风味）</text>
+    <text x="515" y="361" font-size="22" fill="#6b5845">中薯条 + 可乐中杯</text>
+    <path d="M515 389H885" stroke="#ded2ba" stroke-dasharray="4 6"/>
+    <text x="515" y="454" font-size="56" font-weight="700" fill="#30231b">¥22.90</text>
+    <rect x="515" y="483" width="212" height="34" rx="17" fill="#e9f0e4"/>
+    <text x="531" y="507" font-size="20" fill="#326547">预算剩余 ¥7.10</text>
+    <rect x="958" y="214" width="42" height="30" rx="9" fill="#ffc72c"/>
+    <text x="979" y="235" text-anchor="middle" font-size="16" font-weight="700" fill="#483017">03</text>
+    <text x="1013" y="236" font-size="18" fill="#7c654c">汉堡 + 薯条 + 饮料</text>
+    <text x="958" y="286" font-size="28" font-weight="700" fill="#30231b">龙焰鸡腿堡三件套</text>
+    <text x="958" y="326" font-size="22" fill="#6b5845">龙焰鸡腿堡</text>
+    <text x="958" y="361" font-size="22" fill="#6b5845">中薯条 + 可乐中杯</text>
+    <path d="M958 389H1328" stroke="#ded2ba" stroke-dasharray="4 6"/>
+    <text x="958" y="454" font-size="56" font-weight="700" fill="#30231b">¥26.90</text>
+    <rect x="958" y="483" width="212" height="34" rx="17" fill="#e9f0e4"/>
+    <text x="974" y="507" font-size="20" fill="#326547">预算剩余 ¥3.10</text>
+    <rect x="48" y="566" width="1304" height="347" rx="20" fill="url(#coffee)"/>
+    <text x="76" y="613" font-size="25" font-weight="700" fill="#fff6e4">多花的钱，换来了什么？</text>
+    <text x="76" y="645" font-size="18" fill="#cdbda5">比较整单与实际组成，不把套餐差额当作单品售价。</text>
+    <path d="M76 665H1324" stroke="#5f4938"/>
+    <path d="M700 691V879" stroke="#5f4938"/>
+    <text x="76" y="710" font-size="18" letter-spacing="1" fill="#ccb89a">01 → 02 · 整单差价</text>
+    <text x="76" y="768" font-size="46" font-weight="700" fill="#ffce45">+ ¥8.00</text>
+    <text x="76" y="810" font-size="22" fill="#fff4df">换了汉堡，也多了一份中薯条。</text>
+    <text x="76" y="846" font-size="20" fill="#ccbba0">中杯可乐不变；这不是“薯条售价8元”。</text>
+    <text x="732" y="710" font-size="18" letter-spacing="1" fill="#ccb89a">02 → 03 · 整单差价</text>
+    <text x="732" y="768" font-size="46" font-weight="700" fill="#ffce45">+ ¥4.00</text>
+    <text x="732" y="810" font-size="22" fill="#fff4df">鸡排堡换成龙焰鸡腿堡。</text>
+    <text x="732" y="846" font-size="20" fill="#ccbba0">中薯条、中杯可乐各一份保持不变。</text>
+    <text x="48" y="952" font-size="19" fill="#755f46">金额与组成来自同一轮真实批量核价；门店与核价时段不公开。</text>
+    <text x="48" y="982" font-size="18" fill="#755f46">历史快照，当前购买需重新查询与核价。仅比较本轮候选，非全菜单最低价搜索。</text>
+  </g>
+</svg>
